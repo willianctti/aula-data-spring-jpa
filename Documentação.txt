@@ -1,0 +1,148 @@
+vamos usaro contexto do controle de acesso.
+Partiremos da criação de um usuário.
+Primeiro momernto criamos a camada de model
+	com o user class dentro
+
+
+
+criamos nossos metodos name, username e password. Fazemos também os getters e
+setters.
+
+Primeira caracteristica de uma aplicação que usa JPA e temos as entidades:
+torna-la entidade:
+
+import javax.persistence.Entity;
+
+@Entity
+public class User {
+
+
+mas, para usa-la, preciso ter um atributo Id:
+
+@Entity
+public class User {
+    @Id
+    private Integer id;
+
+
+e esse id será gerenciado de forma automática em nosso banco. Definimos a sua 
+respectiva estratégia: identify:
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+
+com isso vamos dizer que esse campo não é chamado de id, vai ser chamado 
+de user_id. Para isso, usamos o @Column 
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Integer id;
+
+
+
+
+agora, vamos definir o column para definir que temos um tamanho máximo e 
+e outros atributos e requisitos:
+
+
+    @Column(length = 50, nullable = false)
+    private String name;
+    @Column(length = 50, nullable = false)
+    private String username;
+    @Column(length = 100, nullable = false)
+    private String password;
+
+
+
+a partir de agora, podemos criar um novo package com a classe UserRepository.
+
+public interface UserRepository extends JpaRepository<User, Integer> {
+    
+}
+
+será uma interface que extenderá de uma i do framework e preciso dizer que com ela trabalharei
+com a classe User e o id dela é inteiro.
+
+com isso, podemos desfrutar de vários metodos.
+
+
+
+
+para inicializar com nosso "main", utilizamos o commandLineRunner.
+Criamos uma nova classe com o nome "StartApp":
+
+package will.auladataspringjpa;
+import org.springframework.boot.CommandLineRunner;
+public class StartApp implements CommandLineRunner{
+    
+    
+
+}
+implementamos o clr e precisamos do run que é um requisito do clr:
+
+
+package will.auladataspringjpa;
+import org.springframework.boot.CommandLineRunner;
+public class StartApp implements CommandLineRunner{
+    @Override
+    public void run(String... args) throws Exception {
+        
+    }
+    
+
+}
+
+
+com isso, vamos definir que essa classe passaa ser um componente.
+agora usamos a injeção de dependencia e injetamos nosso UserRepository.
+Utilizamos o autowired para isso:
+
+package will.auladataspringjpa;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import will.auladataspringjpa.repository.UserRepository;
+
+@Component
+public class StartApp implements CommandLineRunner{
+    @Autowired
+    private UserRepository repository;
+    @Override
+    public void run(String... args) throws Exception {
+
+    }
+
+
+}
+
+
+
+podemos agora criar um novo user:
+
+ @Override
+    public void run(String... args) throws Exception {
+        User user = new User();
+        user.setName("Willian");
+        user.setUsername("Will");
+        user.setPassword("dio");
+
+        repository.save(user);
+    }
+
+
+para verificar se esse User foi realmente salvo fazemos uma listagem dos 
+nossos usuários:
+
+
+        repository.save(user);
+
+        for(User u: repository.findAll()) {
+            System.out.println(u);
+        }
